@@ -1,7 +1,9 @@
 #!/bin/sh
 set -e
 
+PORT=80
 if [ "${USE_TLS}" != 'false' ]; then
+  PORT=443
   sed -i -e "s/#USE_TLS#//g" /etc/rsyslog.conf
 fi
 
@@ -20,17 +22,10 @@ for cfg in ${LOGENTRIES_CONFIG}; do
   if [ "${filter}" = 'hostname' -o "${filter}" = 'fromip' ]; then
     CONFIG="${CONFIG}\n\$template Logentries-${name},\"${token} %HOSTNAME% %syslogtag%%msg%\\\n\"\n"
     if [ "${filter}" = 'hostname' ]; then
-      CONFIG="${CONFIG}if hostname isequal '${value}'"
+      CONFIG="${CONFIG}if \$hostname == '${value}' then { *.* @@data.logentries.com:${PORT};Logentries-${name} }"
     elif [ "${filter}" = 'fromip' ]; then
-      CONFIG="${CONFIG}if \$fromhost-ip startswith '${value}'"
+      CONFIG="${CONFIG}if \$fromhost-ip startswith '${value}' then { *.* @@data.logentries.com:${PORT};Logentries-${name} }"
     fi
-
-    if [ "${USE_TLS}" != 'false' ]; then
-      CONFIG="${CONFIG} then *.* @@data.logentries.com:443;Logentries-${name}"
-    else
-      CONFIG="${CONFIG} then *.* @@data.logentries.com:80;Logentries-${name}"
-    fi
-
 
   else
     echo "[ERROR]: LOGENTRIES_CONFIG filter must be one of hostname|fromip"
@@ -38,7 +33,9 @@ for cfg in ${LOGENTRIES_CONFIG}; do
   fi
 done
 
+CONFIG=
 echo -e "${CONFIG}" > /etc/rsyslog.d/logentries.conf
+echo "[INFO]: starting rsyslog"
 
 exec "$@"
 
