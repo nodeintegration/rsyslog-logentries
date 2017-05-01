@@ -3,6 +3,7 @@ MAINTAINER Brendan Beveridge "brendan@nodeintegration.com.au"
 RUN apk add --no-cache rsyslog rsyslog-tls
 EXPOSE 514 514/udp
 ADD rsyslog.conf /etc/rsyslog.conf
+ADD docker-entrypoint.sh /
 
 ENV TLS_ENABLE false
 
