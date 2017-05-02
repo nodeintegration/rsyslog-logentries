@@ -22,9 +22,9 @@ for cfg in ${LOGENTRIES_CONFIG}; do
   if [ "${filter}" = 'hostname' -o "${filter}" = 'fromip' ]; then
     CONFIG="${CONFIG}\n\$template Logentries-${name},\"${token} %HOSTNAME% %syslogtag%%msg%\\\n\"\n"
     if [ "${filter}" = 'hostname' ]; then
-      CONFIG="${CONFIG}if \$hostname == '${value}' then { *.* @@data.logentries.com:${PORT};Logentries-${name} }"
+      CONFIG="${CONFIG}if \$hostname == '${value}' then @@data.logentries.com:${PORT};Logentries-${name}\n& ~"
     elif [ "${filter}" = 'fromip' ]; then
-      CONFIG="${CONFIG}if \$fromhost-ip startswith '${value}' then { *.* @@data.logentries.com:${PORT};Logentries-${name} }"
+      CONFIG="${CONFIG}if \$fromhost-ip startswith '${value}' then @@data.logentries.com:${PORT};Logentries-${name}\n& ~"
     fi
 
   else
