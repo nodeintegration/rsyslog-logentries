@@ -33,7 +33,6 @@ for cfg in ${LOGENTRIES_CONFIG}; do
   fi
 done
 
-CONFIG=
 echo -e "${CONFIG}" > /etc/rsyslog.d/logentries.conf
 echo "[INFO]: starting rsyslog"
 
