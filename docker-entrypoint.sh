@@ -33,6 +33,11 @@ for cfg in ${LOGENTRIES_CONFIG}; do
   fi
 done
 
+# If rsyslog doesnt clean up properly then it leaves a hanging pid file, clean it up
+if [ -f "/var/run/rsyslogd.pid" ]; then
+  rm /var/run/rsyslogd.pid
+fi
+
 echo -e "${CONFIG}" > /etc/rsyslog.d/logentries.conf
 echo "[INFO]: starting rsyslog"
 
